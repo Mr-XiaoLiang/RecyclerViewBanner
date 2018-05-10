@@ -18,6 +18,11 @@
  > * 缩放大小自定义
  > * 数据源自定义
 
+
+![demo](https://raw.githubusercontent.com/Mr-XiaoLiang/RecyclerViewBanner/master/video/demo.gif)
+
+前往[demo下载地址](https://github.com/Mr-XiaoLiang/RecyclerViewBanner/releases/)，下载安装demo应用，体验比效果图更加流畅的效果。
+
 项目代码使用简单：<br>
 
 Java项目
@@ -84,5 +89,3 @@ BannerUtil.nextPosition()//主动跳转至下一页
 <br>
 
 
-
-![demo](https://raw.githubusercontent.com/Mr-XiaoLiang/RecyclerViewBanner/master/video/demo.gif)
