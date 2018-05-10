@@ -17,6 +17,7 @@
  > * RecyclerView容器尺寸自定义
  > * 缩放大小自定义
  > * 数据源自定义
+ > * 翻页监听（页码及状态）
 
 
 ![demo](https://raw.githubusercontent.com/Mr-XiaoLiang/RecyclerViewBanner/master/video/demo.gif)
