@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">RecyclerViewBannerDeme</string>
-    <string name="action_settings">User Java</string>
+    <string name="action_settings">Java</string>
     <string name="title_activity_main4_j">Main4JActivity</string>
 </resources>

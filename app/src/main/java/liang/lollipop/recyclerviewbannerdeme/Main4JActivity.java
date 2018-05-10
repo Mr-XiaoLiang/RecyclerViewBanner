@@ -57,11 +57,6 @@ public class Main4JActivity extends AppCompatActivity {
                 .attachAdapter(new TestAdapter(dataList,getLayoutInflater()))
                 .setOrientation(Orientation.VERTICAL)
                 .setSecondaryExposedWeight(0.15F)
-                .setSecondaryExposed(0)
-                .setAutoNextDelayed(3000)
-                .setPagerMode(true)
-                .setScaleGap(0.8F)
-                .isAutoNext(true)
                 .init();
 
         ArrayList<Object> bannerList = new ArrayList<>();
