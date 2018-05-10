@@ -7,15 +7,18 @@ import android.support.v7.widget.LinearSnapHelper
 import android.support.v7.widget.PagerSnapHelper
 import android.support.v7.widget.RecyclerView
 import liang.lollipop.rvbannerlib.banner.LBannerLayoutManager
+import liang.lollipop.rvbannerlib.banner.OnSelectedListener
 import liang.lollipop.rvbannerlib.banner.Orientation
+import liang.lollipop.rvbannerlib.banner.ScrollState
 import java.util.concurrent.Delayed
 
 /**
  * Banner初始化的工具类的Kotlin版
  * @author  Lollipop
  */
-class BannerUtil private constructor(private val recyclerView: RecyclerView): Handler.Callback {
-
+class BannerUtil private constructor(private val recyclerView: RecyclerView):
+        Handler.Callback,
+        OnSelectedListener {
 
     companion object {
         fun with(recyclerView: RecyclerView): BannerUtil{
@@ -74,6 +77,8 @@ class BannerUtil private constructor(private val recyclerView: RecyclerView): Ha
 
     private var position = 0
 
+    private val onSelectedListenerList = ArrayList<OnSelectedListener>()
+
     /**
      * 自动轮播的方向，用于控制轮播页面的增减
      */
@@ -129,6 +134,7 @@ class BannerUtil private constructor(private val recyclerView: RecyclerView): Ha
             secondaryExposed = builder.secondaryExposed
             secondaryExposedWeight = builder.secondaryExposedWeight
             scaleGap = builder.scaleGap
+            onSelectedListener = this@BannerUtil
         }
 
         val snapHelper = if(builder.isPagerMode){
@@ -143,18 +149,21 @@ class BannerUtil private constructor(private val recyclerView: RecyclerView): Ha
         return this
     }
 
-    fun notifyDataSetChanged(){
+    fun notifyDataSetChanged(): BannerUtil{
         recyclerView.adapter.notifyDataSetChanged()
+        return this
     }
 
-    fun scrollToPosition(position: Int){
+    fun scrollToPosition(position: Int): BannerUtil{
         recyclerView.scrollToPosition(position)
         this.position = position
+        return this
     }
 
-    fun smoothScrollToPosition(position: Int){
+    fun smoothScrollToPosition(position: Int): BannerUtil{
         recyclerView.smoothScrollToPosition(position)
         this.position = position
+        return this
     }
 
     override fun handleMessage(msg: Message?): Boolean {
@@ -170,35 +179,64 @@ class BannerUtil private constructor(private val recyclerView: RecyclerView): Ha
      * 开启自动轮播后，需要主动调用生命周期方法，才会触发自动轮播
      * 以此来防止生命周期之外的异常
      */
-    fun onResume(){
+    fun onResume(): BannerUtil{
         if(builder.isAutoNext){
             autoHandler.sendEmptyMessageDelayed(WHAT_NEXT_PAGE,builder.autoNextDelayed)
         }
+        return this
     }
 
     /**
      * 开启自动轮播后，需要主动调用生命周期方法，才会自动停止轮播
      * 以此来防止生命周期之外的异常
      */
-    fun onPause(){
+    fun onPause(): BannerUtil{
         autoHandler.removeMessages(WHAT_NEXT_PAGE)
+        return this
     }
 
     /**
      * 下一个页面
      */
-    fun nextPosition(){
+    fun nextPosition(): BannerUtil{
         if(positionDirection){
             position++
         }else{
             position--
         }
         if(position < 0){
-            positionDirection = false
+            positionDirection = true
         }else if(position >= recyclerView.adapter.itemCount){
             positionDirection = false
         }
         smoothScrollToPosition(position)
+        return this
+    }
+
+    /**
+     * 对滑动的监听中转
+     */
+    override fun onSelected(position: Int, state: ScrollState){
+        this.position = position
+        for (listener in onSelectedListenerList){
+            listener.onSelected(position,state)
+        }
+    }
+
+    /**
+     * 添加一个监听滚动的监听器
+     */
+    fun addOnSelectedListener(listener: OnSelectedListener): BannerUtil{
+        onSelectedListenerList.add(listener)
+        return this
+    }
+
+    /**
+     * 移出一个监听滚动的监听器
+     */
+    fun removeOnSelectedListener(listener: OnSelectedListener): BannerUtil{
+        onSelectedListenerList.remove(listener)
+        return this
     }
 
 }

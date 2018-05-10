@@ -14,11 +14,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Random;
 
 import liang.lollipop.rvbannerlib.BannerUtil4J;
+import liang.lollipop.rvbannerlib.banner.OnSelectedListener;
 import liang.lollipop.rvbannerlib.banner.Orientation;
+import liang.lollipop.rvbannerlib.banner.ScrollState;
 
 public class Main4JActivity extends AppCompatActivity {
 
@@ -48,15 +52,31 @@ public class Main4JActivity extends AppCompatActivity {
         final RecyclerView recyclerView2 = findViewById(R.id.recyclerView2);
         final RecyclerView recyclerView3 = findViewById(R.id.recyclerView3);
 
+        final TextView positionValue = findViewById(R.id.positionValue);
+
+        final TextView positionValue2 = findViewById(R.id.positionValue2);
+
         bannerUtil4J = BannerUtil4J.with(recyclerView)
                 .attachAdapter(new TestAdapter(dataList,getLayoutInflater()))
                 .init()
+                .addOnSelectedListener(new OnSelectedListener() {
+                    @Override
+                    public void onSelected(int position, @NotNull ScrollState state) {
+                        positionValue.setText(position+"--"+state.toString());
+                    }
+                })
                 .isAutoNext(true);
 
         BannerUtil4J.with(recyclerView2)
                 .attachAdapter(new TestAdapter(dataList,getLayoutInflater()))
                 .setOrientation(Orientation.VERTICAL)
                 .setSecondaryExposedWeight(0.15F)
+                .addOnSelectedListener(new OnSelectedListener() {
+                    @Override
+                    public void onSelected(int position, @NotNull ScrollState state) {
+                        positionValue2.setText(position+"--"+state.toString());
+                    }
+                })
                 .init();
 
         ArrayList<Object> bannerList = new ArrayList<>();

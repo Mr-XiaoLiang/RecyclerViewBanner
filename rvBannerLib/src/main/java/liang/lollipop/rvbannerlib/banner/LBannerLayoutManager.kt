@@ -60,6 +60,21 @@ class LBannerLayoutManager: RecyclerView.LayoutManager(),RecyclerView.SmoothScro
     private val itemsAttached = SparseBooleanArray()
 
     /**
+     * 滑动的状态
+     */
+    private var scrollState = ScrollState.IDLE
+
+    /**
+     * 滑动选中的监听
+     */
+    var onSelectedListener: OnSelectedListener? = null
+
+    /**
+     * 选中的序号
+     */
+    private var selectedPosition = -1
+
+    /**
      * 获取一个ViewHolder默认的LayoutParams
      * 此LayoutParam将用于ItemView在RecyclerView中的布局
      */
@@ -71,6 +86,9 @@ class LBannerLayoutManager: RecyclerView.LayoutManager(),RecyclerView.SmoothScro
         }
     }
 
+    /**
+     * 对Item进行测量，布局
+     */
     override fun onLayoutChildren(recycler: RecyclerView.Recycler?, state: RecyclerView.State?) {
 
         //如果没有item,那么就清空所有的Item,并且结束
@@ -172,9 +190,8 @@ class LBannerLayoutManager: RecyclerView.LayoutManager(),RecyclerView.SmoothScro
                  */
                 if (!itemsAttached.get(i)) {
                     val scrap = recycler.getViewForPosition(i)
-                    measureChildWithMargins(scrap, 0, 0)
-                    addView(scrap)
                     measureChildWithMargins(scrap,usedWidth,usedHeight)
+                    addView(scrap)
                     val frame = itemsFrames.get(i)
                     layoutDecorated(scrap,
                             frame.left - offsetX,
@@ -194,19 +211,38 @@ class LBannerLayoutManager: RecyclerView.LayoutManager(),RecyclerView.SmoothScro
                 displayFrame.top+borderY,
                 displayFrame.right-borderX,
                 displayFrame.bottom-borderX)
+
+        var selectedIndex = -1
+
         //对非主要Item进行缩放处理
         for(i in 0 until itemCount){
+
             val child = getChildAt(i)?:continue
             val position = getPosition(child)
-            val scale = (1-scaleGap)*offsetWeight(displayFrame,itemsFrames[position])+scaleGap
+            val weight = offsetWeight(displayFrame,itemsFrames[position])
+            val scale = (1-scaleGap)*weight+scaleGap
 
             child.scaleY = scale
             child.scaleX = scale
 
+            if(selectedIndex < 0 && weight >= 0.5F){
+                selectedIndex = i
+            }
+
         }
+
+        selectedPosition = if(selectedIndex < 0){
+            -1
+        }else{
+            getPosition(getChildAt(selectedIndex))
+        }
+        onSelectedListener?.onSelected(selectedPosition,scrollState)
 
     }
 
+    /**
+     * 获取位置偏移的比例，以此来计算Item的缩放
+     */
     private fun offsetWeight(displayFrame: Rect, itemFrame: Rect): Float{
 
         return if(orientation == Orientation.HORIZONTAL){
@@ -216,10 +252,16 @@ class LBannerLayoutManager: RecyclerView.LayoutManager(),RecyclerView.SmoothScro
         }
     }
 
+    /**
+     * 计算两个线段之间的重叠部分的长度
+     */
     private fun overlapLength(start1: Int,start2: Int,end1: Int,end2: Int): Int{
         return Math.min(end1,end2) - Math.max(start1,start2)
     }
 
+    /**
+     * 获取已使用的宽度，即不可用于Item的缩进宽度
+     */
     private fun getUsedWidth(): Int{
         //计算占用的尺寸，Item的测量时，将缩小相应的尺寸，因此将占用部分计算出来
         return if(orientation == Orientation.HORIZONTAL){
@@ -233,6 +275,9 @@ class LBannerLayoutManager: RecyclerView.LayoutManager(),RecyclerView.SmoothScro
         }
     }
 
+    /**
+     * 获取已使用的高度，即不可用于Item的缩进高度
+     */
     private fun getUsedHeight(): Int{
         return if(orientation == Orientation.VERTICAL){
             if(secondaryExposed == 0){
@@ -261,16 +306,21 @@ class LBannerLayoutManager: RecyclerView.LayoutManager(),RecyclerView.SmoothScro
         return height - paddingBottom - paddingTop
     }
 
+    /**
+     * 横向滑动时，回调的方法
+     */
     override fun scrollHorizontallyBy(dx: Int, recycler: RecyclerView.Recycler?, state: RecyclerView.State?): Int {
 
         val tempX = offset + dx
 
         var scrollLength = dx
 
-        val horizontalSpac = getHorizontalSpace()
+        val horizontalSpace = getHorizontalSpace()
 
-        val minOffset = horizontalSpac/2 * -1
-        val maxOffset = itemCount * (horizontalSpac - getUsedWidth()) + getUsedWidth() - horizontalSpac/2
+        val usedWidth = getUsedWidth()
+
+        val minOffset = horizontalSpace/2 * -1
+        val maxOffset = itemCount * (horizontalSpace - usedWidth) + usedWidth - horizontalSpace/2
 
         if( tempX < minOffset ){
             scrollLength = minOffset - offset
@@ -285,14 +335,12 @@ class LBannerLayoutManager: RecyclerView.LayoutManager(),RecyclerView.SmoothScro
             layoutItems(recycler,state)
         }
 
-        val itemWidth = getVerticalSpace() - getUsedHeight()
-        val leftOff = getUsedWidth() / 2
-
-        Log.e("scrollHorizontallyBy","offset-->$offset,itemWidth-->$itemWidth,leftOff-->$leftOff")
-
         return scrollLength
     }
 
+    /**
+     * 获取当前位置到指定位置的距离间隔
+     */
     override fun computeScrollVectorForPosition(targetPosition: Int): PointF {
 
         val leftOff = getUsedWidth() / 2
@@ -315,7 +363,9 @@ class LBannerLayoutManager: RecyclerView.LayoutManager(),RecyclerView.SmoothScro
         return PointF(left,top)
     }
 
-
+    /**
+     * 纵向滑动时，回调的方法
+     */
     override fun scrollVerticallyBy(dy: Int, recycler: RecyclerView.Recycler?, state: RecyclerView.State?): Int {
         val tempY = offset + dy
 
@@ -323,8 +373,10 @@ class LBannerLayoutManager: RecyclerView.LayoutManager(),RecyclerView.SmoothScro
 
         val verticalSpace = getVerticalSpace()
 
+        val usedHeight = getUsedHeight()
+
         val minOffset = verticalSpace/2 * -1
-        val maxOffset = itemCount * (verticalSpace - getUsedHeight()) + getUsedHeight() - verticalSpace/2
+        val maxOffset = itemCount * (verticalSpace - usedHeight) + usedHeight - verticalSpace/2
 
         if( tempY < minOffset ){
             scrollLength = minOffset - offset
@@ -342,6 +394,9 @@ class LBannerLayoutManager: RecyclerView.LayoutManager(),RecyclerView.SmoothScro
         return scrollLength
     }
 
+    /**
+     * 滑动至指定为的方法
+     */
     override fun scrollToPosition(position: Int) {
         val pos = Math.min(Math.max(position, 0),itemCount)
 
@@ -354,6 +409,9 @@ class LBannerLayoutManager: RecyclerView.LayoutManager(),RecyclerView.SmoothScro
         requestLayout()
     }
 
+    /**
+     * 以动画的形式，带有中间过程的滑动到指定位置
+     */
     override fun smoothScrollToPosition(recyclerView: RecyclerView?, state: RecyclerView.State?, position: Int) {
         if(recyclerView == null || state == null){
             return
@@ -366,12 +424,37 @@ class LBannerLayoutManager: RecyclerView.LayoutManager(),RecyclerView.SmoothScro
         startSmoothScroll(scroller)
     }
 
+    /**
+     * 是否允许横向滑动
+     */
     override fun canScrollHorizontally(): Boolean {
         return orientation == Orientation.HORIZONTAL
     }
 
+    /**
+     * 是否允许纵向滑动
+     */
     override fun canScrollVertically(): Boolean {
         return orientation == Orientation.VERTICAL
+    }
+
+    /**
+     * 滑动状态改变的回调方法
+     */
+    override fun onScrollStateChanged(state: Int) {
+        super.onScrollStateChanged(state)
+        scrollState = when(state){
+
+            ScrollState.SETTLING.value -> ScrollState.SETTLING
+
+            ScrollState.DRAGGING.value -> ScrollState.DRAGGING
+
+            else -> ScrollState.IDLE
+
+        }
+
+        onSelectedListener?.onSelected(selectedPosition,scrollState)
+
     }
 
 }

@@ -2,6 +2,7 @@ package liang.lollipop.rvbannerlib;
 
 import android.support.v7.widget.RecyclerView;
 
+import liang.lollipop.rvbannerlib.banner.OnSelectedListener;
 import liang.lollipop.rvbannerlib.banner.Orientation;
 
 /**
@@ -68,39 +69,61 @@ public class BannerUtil4J {
         return this;
     }
 
-    public void notifyDataSetChanged(){
+    public BannerUtil4J notifyDataSetChanged(){
         bannerUtil.notifyDataSetChanged();
+        return this;
     }
 
-    public void  scrollToPosition(int position){
+    public BannerUtil4J  scrollToPosition(int position){
         bannerUtil.scrollToPosition(position);
+        return this;
     }
 
-    public void smoothScrollToPosition(int position){
+    public BannerUtil4J smoothScrollToPosition(int position){
         bannerUtil.smoothScrollToPosition(position);
+        return this;
     }
 
     /**
      * 开启自动轮播后，需要主动调用生命周期方法，才会触发自动轮播
      * 以此来防止生命周期之外的异常
      */
-    public void onResume(){
+    public BannerUtil4J onResume(){
         bannerUtil.onResume();
+        return this;
     }
 
     /**
      * 开启自动轮播后，需要主动调用生命周期方法，才会自动停止轮播
      * 以此来防止生命周期之外的异常
      */
-    public void onPause(){
+    public BannerUtil4J onPause(){
         bannerUtil.onPause();
+        return this;
     }
 
     /**
      * 下一个页面
      */
-    public void nextPosition(){
+    public BannerUtil4J nextPosition(){
         bannerUtil.nextPosition();
+        return this;
+    }
+
+    /**
+     * 添加一个监听滚动的监听器
+     */
+    public BannerUtil4J addOnSelectedListener(OnSelectedListener listener){
+        bannerUtil.addOnSelectedListener(listener);
+        return this;
+    }
+
+    /**
+     * 移出一个监听滚动的监听器
+     */
+    public BannerUtil4J removeOnSelectedListener(OnSelectedListener listener){
+        bannerUtil.removeOnSelectedListener(listener);
+        return this;
     }
 
 }

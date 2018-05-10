@@ -11,7 +11,9 @@ import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import liang.lollipop.rvbannerlib.BannerUtil
+import liang.lollipop.rvbannerlib.banner.OnSelectedListener
 import liang.lollipop.rvbannerlib.banner.Orientation
+import liang.lollipop.rvbannerlib.banner.ScrollState
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -40,6 +42,11 @@ class MainActivity : AppCompatActivity() {
                 .with(recyclerView)
                 .attachAdapter(TestAdapter(dataList,layoutInflater))
                 .init()
+                .addOnSelectedListener(object :OnSelectedListener{
+                    override fun onSelected(position: Int, state: ScrollState) {
+                        positionValue.text = "$position-$state"
+                    }
+                })
                 .isAutoNext(true)
 
         BannerUtil
@@ -47,6 +54,11 @@ class MainActivity : AppCompatActivity() {
                 .attachAdapter(TestAdapter(dataList,layoutInflater))
                 .setOrientation(Orientation.VERTICAL)
                 .setSecondaryExposedWeight(0.15F)
+                .addOnSelectedListener(object :OnSelectedListener{
+                    override fun onSelected(position: Int, state: ScrollState) {
+                        positionValue2.text = "$position-$state"
+                    }
+                })
                 .init()
 
         val bannerList = ArrayList<Any>()

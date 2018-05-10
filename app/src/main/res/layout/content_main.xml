@@ -53,4 +53,24 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_margin="@dimen/fab_margin"/>
 
+    <TextView
+        android:id="@+id/positionValue"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:background="#7000"
+        android:padding="10dp"
+        app:layout_constraintBottom_toBottomOf="@id/recyclerView"
+        app:layout_constraintRight_toRightOf="@id/recyclerView"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/positionValue2"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:background="#7000"
+        android:padding="10dp"
+        app:layout_constraintBottom_toBottomOf="@id/recyclerView2"
+        app:layout_constraintRight_toRightOf="@id/recyclerView2"
+        android:gravity="center"/>
+
 </android.support.constraint.ConstraintLayout>
