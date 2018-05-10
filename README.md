@@ -1,0 +1,2 @@
+# RecyclerViewBannerDeme
+这是一个基于RecyclerView制作的Banner资源库
