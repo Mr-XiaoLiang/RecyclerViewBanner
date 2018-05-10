@@ -18,8 +18,10 @@
  > * 缩放大小自定义
  > * 数据源自定义
 
-项目代码使用简单：
+项目代码使用简单：<br>
+
 Java项目
+
 ``` java
 
 //完整参数设置
@@ -48,7 +50,9 @@ BannerUtil4J.nextPosition();//主动跳转至下一页
 
 ```
 
-Kotlin项目
+<br>
+Kotlin项目 <br>
+
 ``` kotlin
 
 //完整参数设置
