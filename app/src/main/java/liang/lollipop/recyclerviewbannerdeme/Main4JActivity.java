@@ -41,7 +41,7 @@ public class Main4JActivity extends AppCompatActivity {
         Random random = new Random();
 
         for(int i = 0;i<=35;i++){
-            dataList.add(new Bean("Test$index",nextColor(random)));
+            dataList.add(new Bean("Test"+i,nextColor(random)));
         }
 
         final RecyclerView recyclerView = findViewById(R.id.recyclerView);
