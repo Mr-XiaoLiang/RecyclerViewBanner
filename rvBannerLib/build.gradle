@@ -1,18 +1,15 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 27
-
-
 
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
-        versionName "1.1"
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        versionName "1.1.0"
 
     }
 
@@ -21,6 +18,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    lintOptions {
+        abortOnError false
+        checkReleaseBuilds false
     }
 
 }
@@ -32,6 +34,29 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:27.1.1'
 }
 
+allprojects {
+    repositories {
+        jcenter()
+    }
+    //加上这些
+    tasks.withType(Javadoc) {
+        options{ encoding "UTF-8"
+            charSet 'UTF-8'
+            links "http://docs.oracle.com/javase/7/docs/api/"
+        }
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+}
+
 repositories {
     mavenCentral()
+}
+
+publish {
+    userOrg = 'lollipop'      //bintray注册的用户名
+    groupId = 'liang.lollipop.rvbannerlib'         //compile引用时的第1部分groupId
+    artifactId = 'rvbannerlib'     //compile引用时的第2部分项目名
+    publishVersion = '1.1.0'    //compile引用时的第3部分版本号
+    desc = 'This is a Banner resource library based on RecyclerView' //描述
+    website = 'https://github.com/Mr-XiaoLiang/RecyclerViewBanner'
 }

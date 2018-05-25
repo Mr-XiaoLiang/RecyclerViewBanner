@@ -24,6 +24,9 @@
 
 前往[demo下载地址](https://github.com/Mr-XiaoLiang/RecyclerViewBanner/releases/)，下载安装demo应用，体验比效果图更加流畅的效果。
 
+导入方法：
+> implementation 'liang.lollipop.rvbannerlib:rvbannerlib:1.1.0'
+
 项目代码使用简单：<br>
 
 Java项目
